@@ -6,12 +6,17 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
+use App\Http\Requests\CommonRule;
 
 class StartRequest extends FormRequest
 {
     
-    use CommonRule;
-   
+    public $commonRuleInstance;
+
+    public function __construct(CommonRule $commonRule){
+        $this->commonRuleInstance = $commonRule;
+    }
+
     public function authorize()
     {
         return true;
@@ -23,8 +28,10 @@ class StartRequest extends FormRequest
      * @return array
      */
     public function rules()
-    {
-        return array_merge($this->commonRules(),[]);
+    {   
+        
+
+        return array_merge($this->commonRuleInstance->commonRules(),[]);
     }
 
     /**
@@ -34,11 +41,19 @@ class StartRequest extends FormRequest
      */
     public function messages()
     {
-        return array_merge($this->commonMessages());
+        return array_merge($this->commonRuleInstance->commonMessages());
     }
 
     public function isRequestValid(){
         return $this->getValidatorInstance()->fails()?FALSE:TRUE;
+    }
+
+    public function validateSuccess($extra_response){
+        return $this->commonRuleInstance->validateSuccess($extra_response);
+    }
+
+    public function testFields(){
+        return $this->commonRuleInstance->testFields();
     }
 
 }

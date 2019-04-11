@@ -1,12 +1,13 @@
 <?php
 
 namespace App\Http\Requests;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Validator;
 
-trait CommonRule
+class CommonRule
 {
     
-    protected function testFields()
+    public function testFields()
     {
         return [
             'playerId' => 'Ryan_test',
@@ -18,13 +19,21 @@ trait CommonRule
      *
      * @return array
      */
-    protected function commonRules()
+    public function commonRules()
     {
         Validator::extend('isvalidtimestamp', function ($attribute, $timestamp, $parameters, $validator) {
-
+            
             return ((int) $timestamp === $timestamp)
             && ($timestamp <= PHP_INT_MAX)
             && ($timestamp >= ~PHP_INT_MAX);
+        });
+        
+        Validator::extend('isvalidhash', function ($attribute, $hash, $parameters, $validator) {
+            // echo $hash;
+            // // return true;
+            // echo "<pre>";print_r($validator->getData());echo "</pre>";
+            // echo $this->json->all();
+            return TRUE;
         });
 
         return [
@@ -41,14 +50,14 @@ trait CommonRule
         ];
     }
 
-    protected function commonMessages()
+    public function commonMessages()
     {
         return [
             'timestamp.isvalidtimestamp' => 'timestamp is not valid'
         ];
     }
 
-    protected function validateSuccess($extra_response = array()){
+    public function validateSuccess($extra_response = array()){
         $json = [
             'status' => 'success',
             'statusCode' => 0,

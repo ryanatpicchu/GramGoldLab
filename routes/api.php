@@ -13,8 +13,13 @@ use Illuminate\Http\Request;
 |
 */
 
+// Route::prefix('v1')->group(function () {
+Route::prefix('v1')->get('/getTempWalletBalance', 'GameController@getTempWalletBalance');	
 
 Route::prefix('v1')->middleware('jsonapi')->group(function () {
+	Route::get('/genUserSig', 'GameController@genUserSig');
+
+	Route::get('/getTempWalletBalance', 'GameController@getTempWalletBalance');	
 
 	Route::post('/start', 'GameController@start');
 

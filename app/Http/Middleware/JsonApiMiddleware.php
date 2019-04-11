@@ -7,7 +7,7 @@ use Closure;
 class JsonApiMiddleware
 {
     const PARSED_METHODS = [
-        'POST'
+        'POST','GET'
     ];
 
     /**

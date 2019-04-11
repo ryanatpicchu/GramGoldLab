@@ -12,14 +12,22 @@
     "devDependencies": {
         "axios": "^0.18",
         "bootstrap": "^4.0.0",
+        "cheerio": "latest",
         "cross-env": "^5.1",
+        "express": "latest",
         "jquery": "^3.2",
         "laravel-mix": "^4.0.7",
-        "lodash": "^4.17.5",
+        "lodash": "^4.17.11",
         "popper.js": "^1.12",
+        "request": "latest",
         "resolve-url-loader": "^2.3.1",
         "sass": "^1.15.2",
         "sass-loader": "^7.1.0",
         "vue": "^2.5.17"
+    },
+    "dependencies": {
+        "strip-hex-prefix": "^1.0.0",
+        "tronweb": "^2.3.8",
+        "web3-utils": "^1.0.0-beta.52"
     }
 }

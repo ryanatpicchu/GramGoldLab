@@ -6,11 +6,16 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
+use App\Http\Requests\CommonRule;
 
 class CreditRequest extends FormRequest
 {
     
-    use CommonRule;
+    public $commonRuleInstance;
+
+    public function __construct(CommonRule $commonRule){
+        $this->commonRuleInstance = $commonRule;
+    }
    
     public function authorize()
     {
@@ -24,7 +29,7 @@ class CreditRequest extends FormRequest
      */
     public function rules()
     {
-        return array_merge($this->commonRules(),[
+        return array_merge($this->commonRuleInstance->commonRules(),[
             'transactionId' => 'required|string',
             'amount' => 'required|numeric',
             'type' => 'required|string',
@@ -39,11 +44,18 @@ class CreditRequest extends FormRequest
      */
     public function messages()
     {
-        return array_merge($this->commonMessages());
+        return array_merge($this->commonRuleInstance->commonMessages());
     }
 
     public function isRequestValid(){
         return $this->getValidatorInstance()->fails()?FALSE:TRUE;
     }
 
+    public function validateSuccess($extra_response){
+        return $this->commonRuleInstance->validateSuccess($extra_response);
+    }
+
+    public function testFields(){
+        return $this->commonRuleInstance->testFields();
+    }
 }
