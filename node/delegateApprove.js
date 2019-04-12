@@ -1,7 +1,6 @@
 const TronWeb = require('tronweb');
 const web3Utils = require('web3-utils');
 const _ = require('lodash');
-const stripHexPrefix = require('strip-hex-prefix');
 
 const tronWeb = new TronWeb({
     fullHost: 'https://api.shasta.trongrid.io',
@@ -23,7 +22,7 @@ async function delegateApprove(signature){
 	
 	let contract = await tronWeb.contract().at("TS8DBxQQ9R996pEURCTuWqeHUvNUEiQcaw");
 
-	contract.delegateApprove("TF3xFEjH5xR9LhYz9WTa4GjRnPwHoJFLef","TSg8L8WRxK5bYg6gJTcXS6Y3t2LDQwrgVd",51000000000,signature,1233).send().then(result => {
+	contract.delegateApprove("TF3xFEjH5xR9LhYz9WTa4GjRnPwHoJFLef","TSg8L8WRxK5bYg6gJTcXS6Y3t2LDQwrgVd",500000000000000,signature,1233).send().then(result => {
         console.log({result});
     }).catch(err => console.error(err));
 }
@@ -62,7 +61,7 @@ async function generateDelegateApprove(tokenAddress,sender,from,spender,value,no
   }
 
 
-generateDelegateApprove(tronWeb.address.toHex("TS8DBxQQ9R996pEURCTuWqeHUvNUEiQcaw"),tronWeb.address.toHex("TXVds7duK34CUavxW4jq2vFA56H9FWXSLE"),tronWeb.address.toHex("TF3xFEjH5xR9LhYz9WTa4GjRnPwHoJFLef"),tronWeb.address.toHex("TSg8L8WRxK5bYg6gJTcXS6Y3t2LDQwrgVd"),51000000000,1233).then(sig=>{
+generateDelegateApprove(tronWeb.address.toHex("TS8DBxQQ9R996pEURCTuWqeHUvNUEiQcaw"),tronWeb.address.toHex("TXVds7duK34CUavxW4jq2vFA56H9FWXSLE"),tronWeb.address.toHex("TF3xFEjH5xR9LhYz9WTa4GjRnPwHoJFLef"),tronWeb.address.toHex("TSg8L8WRxK5bYg6gJTcXS6Y3t2LDQwrgVd"),500000000000000,1233).then(sig=>{
 	console.log(sig);
 	delegateApprove(sig);
 });

@@ -13,6 +13,12 @@ use Illuminate\Support\Facades\Input;
 
 class GameController extends Controller
 {   
+    
+    public $nodejs_path;
+    public function __construct()
+    {
+        $this->nodejs_path = base_path().'/node';
+    }
 
     public function getTempWalletBalance(){
         
@@ -33,51 +39,89 @@ class GameController extends Controller
         echo $ret;
     }
 
-
     /**
      * Start game
      *
      * @return \Illuminate\Http\Response
      */
-    public function start(StartRequest $request)
+    public function play(PlayRequest $request)
     {   
+        if($request->isRequestValid()){
+            $betAmount = Input::get('betAmount');
+            $winAmount = Input::get('winAmount');
+            
+            /*
+            wager step
+            */
 
+            if( $betAmount > 0){ //bet amount must be > 0
+                $player_balance = $this->getBalance();
+
+                if($player_balance >= $betAmount){
+
+                    $roundId = time();
+
+                    /*
+                     * execute start by admin 
+                     * NOTICE: got to find out a way to confirm transaction is completed
+                     */
+                    $ret = exec("cd ".$this->nodejs_path."; /usr/local/bin/node startByAdmin.js ".$betAmount*pow(10,8)." ".$roundId);
+
+                    if($winAmount > 0){ //win amount > 0, means player win this wager
+                        /*
+                         * execute settle
+                         * NOTICE: got to find out a way to confirm transaction is completed
+                         */
+                        $ret = exec("cd ".$this->nodejs_path."; /usr/local/bin/node settle.js ".$winAmount*pow(10,8)." ".$roundId);
+                    }
+
+                    $player_balance = $this->getBalance();
+
+                    $extra_response = array(
+                        'balance' => $player_balance,
+                        'balanceSequence' => ''
+                    );
+
+                    return $request->validateSuccess($extra_response);
+                }
+                else{
+                    $extra_response = array(
+                        'statusCode'=>200,
+                        'status'=>'player balance is not enough'
+                    );
+                }
+            }
+            else{//bet amount must be > 0
+                $extra_response = array(
+                    'statusCode'=>201,
+                    'status'=>'bet amount can not be less than zero'
+                );
+            }
+
+
+            return $extra_response;
+            
+        }
         
+    }
 
-        // $json_body = '[{ "timestamp":1503383341514, "sessionId":"375e3e418a45494c92bf1e6ec2f7460e", "partnerPlayerId":"demouserf", "currency":"ISO 4217", "gameId":"Vampire", "action":"play", "playerIp":"223.27.48.212" }]';
-
-        // $test_secret_key = 'gramgoldlab';
-        // $url_hash_param = hash_hmac('SHA256', $json_body, $test_secret_key);
-
-        // echo 'requested hash : '.$request->hash."<br />";
-        // echo 'jsoned hash : '.$url_hash_param."<br />";exit;
-
+    public function start(StartRequest $request)
+    {
         if($request->isRequestValid()){
             
+
+            $player_balance = $this->getBalance();
 
             $extra_response = array(
                 'playerId' => $request->testFields()['playerId'],
                 'sessionId' => Input::get('sessionId'),
-                'balance' => $request->testFields()['balance'],
+                'balance' => $player_balance,
                 'balanceSequence' => '',
                 'currency' => Input::get('currency'),
                 'betLimitId' => '',
                 'sessionRTP' => ''
             );
-            return $request->validateSuccess($extra_response);
-        }
-        
-    }
 
-    public function play(PlayRequest $request)
-    {
-        if($request->isRequestValid()){
-            
-
-            $extra_response = array(
-                'balance' => $request->testFields()['balance'],
-                'balanceSequence' => ''
-            );
             return $request->validateSuccess($extra_response);
         }
     }
@@ -88,7 +132,7 @@ class GameController extends Controller
             
 
             $extra_response = array(
-                'balance' => $request->testFields()['balance'],
+                'balance' => $this->getBalance(),
                 'balanceSequence' => ''
             );
             return $request->validateSuccess($extra_response);
@@ -101,7 +145,7 @@ class GameController extends Controller
             
 
             $extra_response = array(
-                'balance' => $request->testFields()['balance'],
+                'balance' =>  $this->getBalance(),
                 'balanceSequence' => ''
             );
             return $request->validateSuccess($extra_response);
@@ -127,6 +171,13 @@ class GameController extends Controller
             );
             return $request->validateSuccess($extra_response);
         }
+    }
+
+
+    private function getBalance(){
+        $player_balance = exec("cd ".$this->nodejs_path."; /usr/local/bin/node getBalance.js ")/pow(10,8);
+
+        return $player_balance;
     }
 
 }
