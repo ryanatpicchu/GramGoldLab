@@ -24,7 +24,7 @@ async function getBalance(address){
 // let address = String(process.argv.slice(2));
 
 // getBalance(address);
-getBalance("TFHXab2EqWU3MrjXXuDT3JwDaiXiDWRsoP");
+getBalance("TF3xFEjH5xR9LhYz9WTa4GjRnPwHoJFLef");
 
 
 
