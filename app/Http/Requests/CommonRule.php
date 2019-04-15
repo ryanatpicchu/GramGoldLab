@@ -29,15 +29,18 @@ class CommonRule
         });
         
         Validator::extend('isvalidhash', function ($attribute, $hash, $parameters, $validator) {
-            // echo $hash;
-            // // return true;
-            // echo "<pre>";print_r($validator->getData());echo "</pre>";
-            // echo $this->json->all();
-            return TRUE;
+
+            $temp_json = $validator->getData();
+            unset($temp_json['hash']);
+            if($hash == hash_hmac('SHA256', '['.json_encode($temp_json).']', 'gramgoldlab888')){
+                return TRUE;
+            }
+            else return FALSE;
+            
         });
 
         return [
-            'hash' => 'required',
+            'hash' => 'required|isvalidhash',
             'timestamp' => 'required|isvalidtimestamp',
             'sessionId' => 'required|string|max:32',
             'partnerPlayerId' => 'required|string',

@@ -33,11 +33,7 @@ class PlayRequest extends FormRequest
             'transactionId' => 'required|string',
             'betAmount' => 'required|numeric',
             'winAmount' => 'required|numeric',
-            'selections' => 'required|integer',
-            'betPerSelection' => 'required|numeric',
-            'freeGames' => 'required|boolean',
-            'round' => 'required|integer',
-            'roundsRemaining' => 'required|integer'
+            'round' => 'required|integer'
         ]);
     }
 

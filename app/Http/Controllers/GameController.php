@@ -9,6 +9,7 @@ use App\Http\Requests\CreditRequest;
 use App\Http\Requests\EndRequest;
 use App\Http\Requests\RevokeRequest;
 
+
 use Illuminate\Support\Facades\Input;
 
 class GameController extends Controller
@@ -29,14 +30,14 @@ class GameController extends Controller
         echo ($ret/100000000);
     }
 
-    public function genUserSig(){
-        echo 'test';exit;
-        $nodejs_path = base_path().'/node';
+    public function genTempHash(){
+        // $temp_json = $validator->getData();
+        $temp_json = Input::all();
         
-        // $ret = exec("cd ".$nodejs_path."; /usr/local/bin/node genUserSig.js 0x37b1030fb71a49d40696a48e7ee7dafaec6e5966dd0030ac8794ef4887ff4913");
-
-        $ret = exec("cd ".$nodejs_path."; /usr/local/bin/node delegateTransfer.js");
-        echo $ret;
+        unset($temp_json['hash']);
+        // $temp_json['timestamp']='111';
+        echo hash_hmac('SHA256', '['.json_encode($temp_json).']', 'gramgoldlab888');
+         
     }
 
     /**
@@ -47,16 +48,18 @@ class GameController extends Controller
     public function play(PlayRequest $request)
     {   
         if($request->isRequestValid()){
-            $betAmount = Input::get('betAmount');
-            $winAmount = Input::get('winAmount');
+
+
+            $betAmount = Input::get('betAmount')/pow(10,2); // calculate for cents purpose
+            $winAmount = Input::get('winAmount')/pow(10,2);// calculate for cents purpose
             
             /*
             wager step
             */
 
-            if( $betAmount > 0){ //bet amount must be > 0
+            if( $betAmount >= 0.01){ //bet amount must be > 0.01 (equal to 1 ggc)
                 $player_balance = $this->getBalance();
-
+                
                 if($player_balance >= $betAmount){
 
                     $roundId = time();
@@ -65,6 +68,7 @@ class GameController extends Controller
                      * execute start by admin 
                      * NOTICE: got to find out a way to confirm transaction is completed
                      */
+
                     $ret = exec("cd ".$this->nodejs_path."; /usr/local/bin/node startByAdmin.js ".$betAmount*pow(10,8)." ".$roundId);
 
                     if($winAmount > 0){ //win amount > 0, means player win this wager
@@ -78,7 +82,7 @@ class GameController extends Controller
                     $player_balance = $this->getBalance();
 
                     $extra_response = array(
-                        'balance' => $player_balance,
+                        'balance' => number_format($player_balance,2),
                         'balanceSequence' => ''
                     );
 
@@ -91,10 +95,10 @@ class GameController extends Controller
                     );
                 }
             }
-            else{//bet amount must be > 0
+            else{//bet amount must be >= 0.01 (1 ggc)
                 $extra_response = array(
                     'statusCode'=>201,
-                    'status'=>'bet amount can not be less than zero'
+                    'status'=>'bet amount can not be less than 1 ggc'
                 );
             }
 
@@ -132,7 +136,7 @@ class GameController extends Controller
             
 
             $extra_response = array(
-                'balance' => $this->getBalance(),
+                'balance' => number_format($this->getBalance(),2),
                 'balanceSequence' => ''
             );
             return $request->validateSuccess($extra_response);
@@ -176,6 +180,8 @@ class GameController extends Controller
 
     private function getBalance(){
         $player_balance = exec("cd ".$this->nodejs_path."; /usr/local/bin/node getBalance.js ")/pow(10,8);
+
+
 
         return $player_balance;
     }

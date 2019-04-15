@@ -8,6 +8,9 @@ const tronWeb = new TronWeb({
 
 });
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 var privateList = Array();
 privateList['TF3xFEjH5xR9LhYz9WTa4GjRnPwHoJFLef'] = '37b1030fb71a49d40696a48e7ee7dafaec6e5966dd0030ac8794ef4887ff4913';//account 2
@@ -23,7 +26,15 @@ async function startByAdmin(signature,roundId,amount){
 	let contract = await tronWeb.contract().at("TSg8L8WRxK5bYg6gJTcXS6Y3t2LDQwrgVd");
 
 	contract.startByAdmin("TF3xFEjH5xR9LhYz9WTa4GjRnPwHoJFLef",roundId,amount,signature).send().then(result => {
-        console.log({result});
+        console.log(result);
+
+     //    tronWeb.trx.getTransaction(result).then(
+	    //     tranResult=>{
+	    //     	console.log(tranResult);
+	    //     }
+	    // ).catch(err=>console.error(err));
+        
+
     }).catch(err => console.error(err));
 }
 
@@ -34,7 +45,7 @@ async function generateDelegateStart(gameAddress,player,roundId,amount){
     temp += _.padStart(roundId.toString(16), 64, '0');
     temp += _.padStart(amount.toString(16),64,'0')
     let msg = await web3Utils.sha3(temp);
-    const sigData =await tronWeb.trx.sign(msg,privateList[tronWeb.address.fromHex(player)]);
+    const sigData = await tronWeb.trx.sign(msg,privateList[tronWeb.address.fromHex(player)]);
     return sigData;
   }
 
@@ -45,8 +56,8 @@ let roundId = Number(process.argv[3]);
 // const roundId = Math.floor(dateTime / 1000);
 
 generateDelegateStart(tronWeb.address.toHex("TSg8L8WRxK5bYg6gJTcXS6Y3t2LDQwrgVd"),tronWeb.address.toHex("TF3xFEjH5xR9LhYz9WTa4GjRnPwHoJFLef"),roundId,amount).then(sig=>{
-	console.log(amount);
-	console.log(roundId);
+	// console.log(amount);
+	// console.log(roundId);
 	startByAdmin(sig,roundId,amount);
 });
 
