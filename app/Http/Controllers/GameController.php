@@ -9,6 +9,7 @@ use App\Http\Requests\CreditRequest;
 use App\Http\Requests\EndRequest;
 use App\Http\Requests\RevokeRequest;
 
+use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Input;
 
@@ -32,8 +33,11 @@ class GameController extends Controller
 
     public function genTempHash(){
         // $temp_json = $validator->getData();
-        $temp_json = Input::all();
-        
+        // $bodyContent = $request->getContent();
+        // $content = Request::all();
+
+        $temp_json = Input::json()->all();
+
         unset($temp_json['hash']);
         // $temp_json['timestamp']='111';
         echo hash_hmac('SHA256', '['.json_encode($temp_json).']', 'gramgoldlab888');
@@ -114,12 +118,10 @@ class GameController extends Controller
         if($request->isRequestValid()){
             
 
-            $player_balance = $this->getBalance();
-
             $extra_response = array(
-                'playerId' => $request->testFields()['playerId'],
+                'playerId' => Input::get('partnerPlayerId'),
                 'sessionId' => Input::get('sessionId'),
-                'balance' => $player_balance,
+                'balance' => number_format($this->getBalance(),2),
                 'balanceSequence' => '',
                 'currency' => Input::get('currency'),
                 'betLimitId' => '',

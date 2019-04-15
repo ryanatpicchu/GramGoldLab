@@ -20,13 +20,14 @@ class JsonApiMiddleware
     public function handle($request, Closure $next)
     {
         if (in_array($request->getMethod(), self::PARSED_METHODS)) {
-
            /*
             * get json body content, decode it and merge with request contents
             */
-            $temp = json_decode($request->getContent(),true);
 
-            $request->merge($temp[0]);
+            $temp = json_decode($request->getContent(),true);
+            // echo "<pre>";print_r($temp);echo "</pre>";exit;
+
+            $request->merge($temp);
         }
 
         return $next($request);
