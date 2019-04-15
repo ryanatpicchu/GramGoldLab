@@ -83,10 +83,10 @@ class GameController extends Controller
                         $ret = exec("cd ".$this->nodejs_path."; /usr/local/bin/node settle.js ".$winAmount*pow(10,8)." ".$roundId);
                     }
 
-                    $player_balance = $this->getBalance();
+                    
 
                     $extra_response = array(
-                        'balance' => number_format($player_balance,2),
+                        'balance' => number_format($this->getBalance()*pow(10,2), 0, '.', ''),
                         'balanceSequence' => ''
                     );
 
@@ -121,7 +121,7 @@ class GameController extends Controller
             $extra_response = array(
                 'playerId' => Input::get('partnerPlayerId'),
                 'sessionId' => Input::get('sessionId'),
-                'balance' => number_format($this->getBalance(),2),
+                'balance' => number_format($this->getBalance()*pow(10,2), 0, '.', ''),
                 'balanceSequence' => '',
                 'currency' => Input::get('currency'),
                 'betLimitId' => '',
@@ -138,9 +138,10 @@ class GameController extends Controller
             
 
             $extra_response = array(
-                'balance' => number_format($this->getBalance(),2),
+                'balance' => number_format($this->getBalance()*pow(10,2), 0, '.', ''),
                 'balanceSequence' => ''
             );
+
             return $request->validateSuccess($extra_response);
         }
     }
