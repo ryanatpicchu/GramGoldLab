@@ -40,7 +40,7 @@ class GameController extends Controller
 
         unset($temp_json['hash']);
         // $temp_json['timestamp']='111';
-        echo hash_hmac('SHA256', '['.json_encode($temp_json).']', 'gramgoldlab888');
+        echo hash_hmac('SHA256', json_encode($temp_json), 'gramgoldlab888');
          
     }
 

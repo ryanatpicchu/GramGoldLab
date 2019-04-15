@@ -31,8 +31,10 @@ class CommonRule
         Validator::extend('isvalidhash', function ($attribute, $hash, $parameters, $validator) {
 
             $temp_json = $validator->getData();
+            // $temp_json = Input::json()->all();
+            // echo "<pre>";print_r($temp_json);echo "</pre>";exit;
             unset($temp_json['hash']);
-            if($hash == hash_hmac('SHA256', '['.json_encode($temp_json).']', 'gramgoldlab888')){
+            if($hash == hash_hmac('SHA256', json_encode($temp_json), 'gramgoldlab888')){
                 return TRUE;
             }
             else return FALSE;
