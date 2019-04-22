@@ -5,7 +5,7 @@ const tronWeb = new TronWeb({
 });
 
 
-async function getBalance(address){
+async function getTotalSupply(){
 	//account 1: TXVds7duK34CUavxW4jq2vFA56H9FWXSLE
 	//account 2: TF3xFEjH5xR9LhYz9WTa4GjRnPwHoJFLef
 	//account 3: TFHXab2EqWU3MrjXXuDT3JwDaiXiDWRsoP
@@ -15,7 +15,7 @@ async function getBalance(address){
 	//ggc contract 0422 : TW5oTxxwTzNFv7EbiSy7FEKN3qAeFLF3N1
 
 	let contract = await tronWeb.contract().at("TW5oTxxwTzNFv7EbiSy7FEKN3qAeFLF3N1");
-	let result = await contract.balanceOf(address).call();
+	let result = await contract.totalSupply().call();
 	console.log(result.toString());
 };
 
@@ -23,7 +23,7 @@ async function getBalance(address){
 // let address = String(process.argv.slice(2));
 
 // getBalance(address);
-getBalance("TXVds7duK34CUavxW4jq2vFA56H9FWXSLE");
+getTotalSupply();
 
 
 

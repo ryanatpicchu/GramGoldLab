@@ -22,6 +22,13 @@ class GameController extends Controller
         $this->nodejs_path = base_path().'/node';
     }
 
+    public function setSecureToken(Request $request){
+        
+        $input = $request->all();
+        echo "<pre>";print_r($input);echo "</pre>";
+        // echo 'test';
+    }
+
     public function getTempWalletBalance(){
         
         $nodejs_path = base_path().'/node';
@@ -72,7 +79,7 @@ class GameController extends Controller
                      * execute start by admin 
                      * NOTICE: got to find out a way to confirm transaction is completed
                      */
-
+                    echo "cd ".$this->nodejs_path."; /usr/local/bin/node startByAdmin.js ".$betAmount*pow(10,8)." ".$roundId;exit;
                     $ret = exec("cd ".$this->nodejs_path."; /usr/local/bin/node startByAdmin.js ".$betAmount*pow(10,8)." ".$roundId);
 
                     if($winAmount > 0){ //win amount > 0, means player win this wager
