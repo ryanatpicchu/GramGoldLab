@@ -83,7 +83,7 @@ class GameController extends Controller
                      */
                     
                     $ret = exec("cd ".$this->nodejs_path."; /usr/local/bin/node startByAdmin.js ".$betAmount*pow(10,8)." ".$roundId);
-                    var_dump($ret);exit;
+                    
                     if($winAmount > 0){ //win amount > 0, means player win this wager
 
                         /*
