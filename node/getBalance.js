@@ -14,7 +14,7 @@ async function getBalance(address){
 
 	//ggc contract 0422 : TW5oTxxwTzNFv7EbiSy7FEKN3qAeFLF3N1
 
-	let contract = await tronWeb.contract().at("TW5oTxxwTzNFv7EbiSy7FEKN3qAeFLF3N1");
+	let contract = await tronWeb.contract().at("TS8DBxQQ9R996pEURCTuWqeHUvNUEiQcaw");
 	let result = await contract.balanceOf(address).call();
 	console.log(result.toString());
 };
@@ -23,7 +23,7 @@ async function getBalance(address){
 // let address = String(process.argv.slice(2));
 
 // getBalance(address);
-getBalance("TXVds7duK34CUavxW4jq2vFA56H9FWXSLE");
+getBalance("TF3xFEjH5xR9LhYz9WTa4GjRnPwHoJFLef");
 
 
 
