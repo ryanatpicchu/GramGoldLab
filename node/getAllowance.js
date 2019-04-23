@@ -12,10 +12,12 @@ async function getAllowance(){
 	//account 3: TFHXab2EqWU3MrjXXuDT3JwDaiXiDWRsoP
 	//ggc contract : TS8DBxQQ9R996pEURCTuWqeHUvNUEiQcaw
 	//game contract : TSg8L8WRxK5bYg6gJTcXS6Y3t2LDQwrgVd
+	//ggc contract 0423 : TKuTt2BB6Nh8r18Vq7X8kyUgJf9P2DibQF
+	//game contract 0423 : TLciAxFyz54pt7haMDpnDSD8vFjk5hzePR
 
-	let contract = await tronWeb.contract().at("TS8DBxQQ9R996pEURCTuWqeHUvNUEiQcaw");
+	let contract = await tronWeb.contract().at("TKuTt2BB6Nh8r18Vq7X8kyUgJf9P2DibQF");
 
-	contract.allowance("TF3xFEjH5xR9LhYz9WTa4GjRnPwHoJFLef","TSg8L8WRxK5bYg6gJTcXS6Y3t2LDQwrgVd").call().then(result => {
+	contract.allowance("TF3xFEjH5xR9LhYz9WTa4GjRnPwHoJFLef","TLciAxFyz54pt7haMDpnDSD8vFjk5hzePR").call().then(result => {
 		console.log(result.toString());
 	}).catch(err => console.error(err));	
 }

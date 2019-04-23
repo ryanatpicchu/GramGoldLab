@@ -39,7 +39,7 @@ async function withdrawFund(amount){
 	// console.log(result.toString());
 };
 
-let amount = 5000000000;
+let amount = 500000000;
 withdrawFund(amount);
 
 

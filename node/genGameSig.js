@@ -19,8 +19,10 @@ async function startByAdmin(signature,roundId){
 	//account 3: TFHXab2EqWU3MrjXXuDT3JwDaiXiDWRsoP
 	//ggc contract : TS8DBxQQ9R996pEURCTuWqeHUvNUEiQcaw
 	//game contract : TSg8L8WRxK5bYg6gJTcXS6Y3t2LDQwrgVd
+    //ggc contract 0423 : TKuTt2BB6Nh8r18Vq7X8kyUgJf9P2DibQF
+    //game contract 0423 : TLciAxFyz54pt7haMDpnDSD8vFjk5hzePR
 	
-	let contract = await tronWeb.contract().at("TSg8L8WRxK5bYg6gJTcXS6Y3t2LDQwrgVd");
+	let contract = await tronWeb.contract().at("TLciAxFyz54pt7haMDpnDSD8vFjk5hzePR");
 
 	contract.startByAdmin("TF3xFEjH5xR9LhYz9WTa4GjRnPwHoJFLef",roundId,100,signature).send().then(result => {
         console.log({result});
@@ -42,7 +44,7 @@ async function generateDelegateStart(gameAddress,player,roundId,amount){
 const dateTime = Date.now();
 const timestamp = Math.floor(dateTime / 1000);
 
-generateDelegateStart(tronWeb.address.toHex("TSg8L8WRxK5bYg6gJTcXS6Y3t2LDQwrgVd"),tronWeb.address.toHex("TF3xFEjH5xR9LhYz9WTa4GjRnPwHoJFLef"),timestamp,100).then(sig=>{
+generateDelegateStart(tronWeb.address.toHex("TLciAxFyz54pt7haMDpnDSD8vFjk5hzePR"),tronWeb.address.toHex("TF3xFEjH5xR9LhYz9WTa4GjRnPwHoJFLef"),timestamp,100).then(sig=>{
 	console.log(sig);
     console.log(timestamp);
 	startByAdmin(sig,timestamp);

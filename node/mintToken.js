@@ -10,7 +10,9 @@ async function mintToken(address,amount){
 	//account 1: TXVds7duK34CUavxW4jq2vFA56H9FWXSLE
 	//account 2: TF3xFEjH5xR9LhYz9WTa4GjRnPwHoJFLef
 	//account 3: TFHXab2EqWU3MrjXXuDT3JwDaiXiDWRsoP
-	let contract = await tronWeb.contract().at("TW5oTxxwTzNFv7EbiSy7FEKN3qAeFLF3N1");
+	//ggc contract 0423 : TKuTt2BB6Nh8r18Vq7X8kyUgJf9P2DibQF
+	//game contract 0423 : TLciAxFyz54pt7haMDpnDSD8vFjk5hzePR
+	let contract = await tronWeb.contract().at("TKuTt2BB6Nh8r18Vq7X8kyUgJf9P2DibQF");
 
 	contract.mintToken(address,amount).send().then(result => {
         console.log({result});

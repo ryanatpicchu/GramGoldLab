@@ -63,6 +63,8 @@ class GameController extends Controller
 
             $betAmount = Input::get('betAmount')/pow(10,2); // calculate for cents purpose
             $winAmount = Input::get('winAmount')/pow(10,2);// calculate for cents purpose
+
+
             
             /*
             wager step
@@ -81,8 +83,9 @@ class GameController extends Controller
                      */
                     
                     $ret = exec("cd ".$this->nodejs_path."; /usr/local/bin/node startByAdmin.js ".$betAmount*pow(10,8)." ".$roundId);
-
+                    var_dump($ret);exit;
                     if($winAmount > 0){ //win amount > 0, means player win this wager
+
                         /*
                          * execute settle
                          * NOTICE: got to find out a way to confirm transaction is completed
