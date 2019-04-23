@@ -25,7 +25,7 @@ async function settle(player, roundId, payout, roundHash, metaData){
 
 let payout = Number(process.argv[2]);
 let roundId = Number(process.argv[3]);
-let metaMsg = "You win"+(payout/100000000);
+let metaMsg = "You win "+(payout/100000000);
 
 
 settle("TF3xFEjH5xR9LhYz9WTa4GjRnPwHoJFLef",roundId,payout,web3Utils.asciiToHex(metaMsg),metaMsg);

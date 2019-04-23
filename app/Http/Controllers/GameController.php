@@ -83,15 +83,12 @@ class GameController extends Controller
                      */
                     
                     $ret = exec("cd ".$this->nodejs_path."; /usr/local/bin/node startByAdmin.js ".$betAmount*pow(10,8)." ".$roundId);
-                    
-                    if($winAmount > 0){ //win amount > 0, means player win this wager
 
-                        /*
-                         * execute settle
-                         * NOTICE: got to find out a way to confirm transaction is completed
-                         */
-                        $ret = exec("cd ".$this->nodejs_path."; /usr/local/bin/node settle.js ".$winAmount*pow(10,8)." ".$roundId);
-                    }
+                    /*
+                    * execute settle
+                    * NOTICE: got to find out a way to confirm transaction is completed
+                    */
+                    $ret = exec("cd ".$this->nodejs_path."; /usr/local/bin/node settle.js ".$winAmount*pow(10,8)." ".$roundId);
 
                     
 
