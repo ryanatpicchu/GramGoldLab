@@ -10,7 +10,6 @@ use App\Http\Requests\EndRequest;
 use App\Http\Requests\RevokeRequest;
 
 use Illuminate\Http\Request;
-
 use Illuminate\Support\Facades\Input;
 
 class GameController extends Controller
@@ -36,6 +35,7 @@ class GameController extends Controller
     }
 
     public function getTempWalletBalance(){
+        exit;
         
         $nodejs_path = base_path().'/node';
         
