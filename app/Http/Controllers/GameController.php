@@ -35,7 +35,6 @@ class GameController extends Controller
     }
 
     public function getTempWalletBalance(){
-        exit;
         
         $nodejs_path = base_path().'/node';
         
