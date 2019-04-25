@@ -26,7 +26,13 @@ class GameController extends Controller
         
         $input = $request->all();
         echo "<pre>";print_r($input);echo "</pre>";
+        error_log($input['unlockToken']);
         // echo 'test';
+    }
+
+    public function unlockTokenToSignature(){
+        
+
     }
 
     public function getTempWalletBalance(){
@@ -84,7 +90,7 @@ class GameController extends Controller
                     
                     $ret = exec("cd ".$this->nodejs_path."; /usr/local/bin/node startByAdmin.js ".$betAmount*pow(10,8)." ".$roundId);
 
-                    /*
+                   /*
                     * execute settle
                     * NOTICE: got to find out a way to confirm transaction is completed
                     */

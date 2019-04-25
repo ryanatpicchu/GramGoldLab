@@ -19,7 +19,9 @@ use Illuminate\Http\Request;
 Route::prefix('v1')->middleware('jsonapi')->group(function () {
 	Route::post('/genTempHash', 'GameController@genTempHash');
 
-	Route::post('/setSecureToken', 'GameController@setSecureToken');	
+	Route::post('/setSecureToken', 'GameController@setSecureToken');
+
+	Route::post('/unlockTokenToSignature', 'GameController@unlockTokenToSignature');	
 	
 	Route::post('/getTempWalletBalance', 'GameController@getTempWalletBalance');	
 

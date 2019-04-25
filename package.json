@@ -26,6 +26,7 @@
         "vue": "^2.5.17"
     },
     "dependencies": {
+        "js-sha256": "^0.9.0",
         "strip-hex-prefix": "^1.0.0",
         "tronweb": "^2.3.8",
         "web3-utils": "^1.0.0-beta.52"
