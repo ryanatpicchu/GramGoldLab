@@ -373,7 +373,7 @@ class Handler extends ExceptionHandler
         $json = [
             'status' => $status,
             'statusCode' => $statusCode,
-            'errorMessage' => $exception->validator->getMessageBag(),
+            'errorMessage' => '',
             'userMessage' => ''
         ];
 
