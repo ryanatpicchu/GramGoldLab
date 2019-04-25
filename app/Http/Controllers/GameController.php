@@ -26,6 +26,7 @@ class GameController extends Controller
         $input = $request->all();
         echo "<pre>";print_r($input);echo "</pre>";
         error_log($input['unlockToken']);
+        error_log($input['walletAddress']);
         // echo 'test';
     }
 
@@ -35,7 +36,7 @@ class GameController extends Controller
     }
 
     public function getTempWalletBalance(){
-        
+
         $nodejs_path = base_path().'/node';
         
         $ret = exec("cd ".$nodejs_path."; /usr/local/bin/node getTempWalletBalance.js");

@@ -22,17 +22,18 @@ class OperatorController extends Controller
 
         $required_key = $this->ggcRequiredKey();
 
-        $hash = hash_hmac('SHA256', json_encode($required_key), $input['partner']);
-        $t = time();
+        $hash = hash_hmac('SHA256',json_encode($required_key),$input['partner']);
+        
 
-        echo json_encode(array('hash'=>$hash, 't'=>$t, 'partner'=>$input['partner']));
+        echo json_encode(array('hash'=>$hash,'t'=>$required_key['t'] , 'partner'=>$input['partner']));
     }
 
     private function ggcRequiredKey(){
         $ggc_key = 'gramgoldlab888_test_key';
         $ggc_secret = 'gramgoldlab888_test_secret';
+        $t = time();
 
-        return array('key'=>$ggc_key, 'secret'=>$ggc_secret);
+        return array('key'=>$ggc_key, 'secret'=>$ggc_secret, 't'=>(String)$t);
     }
 
 }
