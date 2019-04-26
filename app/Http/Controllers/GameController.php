@@ -58,7 +58,7 @@ class GameController extends Controller
     }
 
     /**
-     * Start game
+     * Play game
      *
      * @return \Illuminate\Http\Response
      */
@@ -159,6 +159,14 @@ class GameController extends Controller
         }
     }
 
+
+    /**
+     * 派彩：not ready yet
+     * 必須直接transfer 金額給player
+     * 
+     * @return \Illuminate\Http\Response
+     */
+
     public function credit(CreditRequest $request)
     {
         if($request->isRequestValid()){
@@ -172,6 +180,13 @@ class GameController extends Controller
         }
     }
 
+    /**
+     * End：not ready yet
+     * 停止後直接呼叫 wallet api 去上鍊
+     * 
+     * @return \Illuminate\Http\Response
+     */
+
     public function end(EndRequest $request)
     {
         if($request->isRequestValid()){
@@ -180,6 +195,12 @@ class GameController extends Controller
         }
     }
 
+    /**
+     * Revoke: not ready yet (尚未討論)
+     * 取回或取消某筆下注
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function revoke(RevokeRequest $request)
     {
         if($request->isRequestValid()){
@@ -196,8 +217,6 @@ class GameController extends Controller
 
     private function getBalance(){
         $player_balance = exec("cd ".$this->nodejs_path."; /usr/local/bin/node getBalance.js ")/pow(10,8);
-
-
 
         return $player_balance;
     }
