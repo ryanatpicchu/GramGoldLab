@@ -14,8 +14,7 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Storage;
 
 use GuzzleHttp\Client;
-use function GuzzleHttp\json_encode;
-use TheSeer\Tokenizer\Exception;
+use GuzzleHttp\Exception\ServerException;
 
 class GameController extends Controller
 {   
@@ -347,7 +346,7 @@ class GameController extends Controller
                 ' | input: '. json_encode($wallet_input));
             return json_decode($wallet_result);
 
-        } catch (Exception $e) {
+        } catch (ServerException $e) {
             error_log(__FUNCTION__ . ' | ' . $e->getMessage());
             return false;
         }
@@ -382,7 +381,7 @@ class GameController extends Controller
             'nextUnlockToken' => $nextUnlockToken,
             'walletAddress' => $walletAddress,
             ]));
-        error_log(__FUNCTION__ . ' | ' . sessionId);
+        error_log(__FUNCTION__ . ' | ' . $sessionId);
     }
 
     // get session disk
