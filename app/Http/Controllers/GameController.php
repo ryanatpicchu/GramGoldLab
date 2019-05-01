@@ -216,6 +216,21 @@ class GameController extends Controller
 
             $player_balance = $this->getDiskBalance($sessionId);
 
+            // call wallet if session not start yet
+            if($player_balance === false){
+                error_log(__FUNCTION__ . '|' . $sessionId . '| call wallet');
+
+                // parse token
+                $token = Input::get('token');
+                $tokens = explode('_', $token);
+                $wallet_result = self::call_wallet('balance', 
+                    ['timestamp' => time(), 'walletAddress' => $tokens[0], 'unlockToken' => $tokens[1]]);
+
+                if(isset($wallet_result->statusCode)){
+                    $player_balance = $wallet_result->balance;
+                }
+            }
+
             if($player_balance === false){
                 $extra_response = array(
                     'statusCode'=>666,
