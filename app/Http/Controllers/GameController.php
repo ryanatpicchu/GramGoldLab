@@ -344,7 +344,7 @@ class GameController extends Controller
             error_log(__FUNCTION__ . 
                 ' | '. $action . ' | ' . $wallet_response->getStatusCode() .
                 ' | result: ' . $wallet_result . 
-                ' | input: '. json_enocde($wallet_input));
+                ' | input: '. json_encode($wallet_input));
             return json_decode($wallet_result);
 
         } catch (Exception $e) {
