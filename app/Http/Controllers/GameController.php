@@ -341,6 +341,7 @@ class GameController extends Controller
                 ['json' =>  $wallet_input, 'http_errors' => false]);
     
             $wallet_result = (string) $wallet_response->getBody();
+            error_log(__FUNCTION__ . ' | '. $action .', result: ' . $wallet_result);
             return json_decode($wallet_result);
 
         } catch (Exception $e) {
@@ -378,6 +379,7 @@ class GameController extends Controller
             'nextUnlockToken' => $nextUnlockToken,
             'walletAddress' => $walletAddress,
             ]));
+        error_log(__FUNCTION__ . ' | ' . sessionId);
     }
 
     // get session disk
