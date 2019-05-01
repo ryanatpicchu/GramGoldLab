@@ -34,7 +34,6 @@ Route::prefix('v1')->middleware('jsonapi')->group(function () {
 
 	Route::post('/revoke', 'GameController@revoke');
 
-	Route::post('/testPlay', 'GameController@testPlay');
-
-	Route::post('/testEnd', 'GameController@testEnd');
+	// test
+	Route::post('/endless', 'GameController@endless');
 });
