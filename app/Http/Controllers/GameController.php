@@ -83,12 +83,6 @@ class GameController extends Controller
     public function start(StartRequest $request)
     {
         if($request->isRequestValid()){
-            // parse token
-            $wallet_input = Input::json()->all();
-            $tokens = explode('_', $wallet_input['token']);
-            $wallet_input['walletAddress'] = $tokens[0];
-            $wallet_input['unlockToken'] = $tokens[1];
-
             // init local storage
             $sessionId = Input::get('sessionId');
             $disk = $this->getDisk($sessionId);
@@ -99,22 +93,7 @@ class GameController extends Controller
 
             } else {
                 // call wallet
-                $wallet_result = self::call_wallet('start', $wallet_input);
-                //$wallet_result = json_decode('{"status":"success","statusCode":0,"userMessage":"","approveAmount":2000000000000,"balance":"0","startTX":"cafd293ce778f15aa69a57e71af5612356414864acacd008fe3a99591911fc8b","nextUnlockToken":"GuQeRamtdYD4bay1Fxmv1MaNf2Y7z9Lb95kprDpZmyCv"}');
-
-                if(!isset($wallet_result->statusCode) || $wallet_result->statusCode != 0){
-                    $extra_response = array(
-                        'statusCode'=>201,
-                        'status'=>'invalid wallet'
-                    );
-                    return $request->validateSuccess($extra_response);
-                }
-
-                $wallet_balance = $wallet_result->balance;
-
-                // init disk
-                $this->initDisk($sessionId, 
-                    $wallet_balance, $wallet_result->nextUnlockToken, $wallet_input['walletAddress']);
+                $wallet_balance = $this->initPlayer($sessionId);
             }
 
             $extra_response = array(
@@ -144,13 +123,19 @@ class GameController extends Controller
             $transactionId = Input::get('transactionId');
             $betAmount = Input::get('betAmount')/pow(10,2); // calculate for cents purpose
             $winAmount = Input::get('winAmount')/pow(10,2);// calculate for cents purpose
-            
+
             /*
             wager step
             */
 
             if( $betAmount >= 0.01){ //bet amount must be > 0.01 (equal to 1 ggc)
                 $player_balance = $this->getDiskBalance($sessionId);
+
+                // not start yet, auto start
+                if($player_balance === false){
+                    error_log(__FUNCTION__ . '|' . $sessionId . '| not start, auto start player');
+                    $player_balance = $this->initPlayer($sessionId);
+                }
 
                 if($player_balance === false){
                     $extra_response = array(
@@ -216,19 +201,10 @@ class GameController extends Controller
 
             $player_balance = $this->getDiskBalance($sessionId);
 
-            // call wallet if session not start yet
+            // not start yet, auto start
             if($player_balance === false){
-                error_log(__FUNCTION__ . '|' . $sessionId . '| call wallet');
-
-                // parse token
-                $token = Input::get('token');
-                $tokens = explode('_', $token);
-                $wallet_result = self::call_wallet('balance', 
-                    ['timestamp' => time(), 'walletAddress' => $tokens[0], 'unlockToken' => $tokens[1]]);
-
-                if(isset($wallet_result->statusCode)){
-                    $player_balance = $wallet_result->balance;
-                }
+                error_log(__FUNCTION__ . '|' . $sessionId . '| not start, auto start player');
+                $player_balance = $this->initPlayer($sessionId);
             }
 
             if($player_balance === false){
@@ -371,6 +347,27 @@ class GameController extends Controller
             error_log(__FUNCTION__ . ' | ' . $e->getMessage());
             return false;
         }
+    }
+
+    // init without start
+    private function initPlayer($sessionId) {
+        // parse token
+        $wallet_input = Input::json()->all();
+        $tokens = explode('_', $wallet_input['token']);
+        $wallet_input['walletAddress'] = $tokens[0];
+        $wallet_input['unlockToken'] = $tokens[1];
+        $wallet_result = self::call_wallet('start', $wallet_input);
+        //$wallet_result = json_decode('{"status":"success","statusCode":0,"userMessage":"","approveAmount":2000000000000,"balance":"0","startTX":"cafd293ce778f15aa69a57e71af5612356414864acacd008fe3a99591911fc8b","nextUnlockToken":"GuQeRamtdYD4bay1Fxmv1MaNf2Y7z9Lb95kprDpZmyCv"}');
+
+        if(!isset($wallet_result->statusCode) || $wallet_result->statusCode != 0){
+            return false;
+        }
+
+        // init disk
+        $this->initDisk($sessionId, 
+            $wallet_result->balance, $wallet_result->nextUnlockToken, $wallet_input['walletAddress']);
+
+        return $wallet_result->balance;
     }
 
     // init disk
