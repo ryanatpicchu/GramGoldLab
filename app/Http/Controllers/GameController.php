@@ -341,7 +341,10 @@ class GameController extends Controller
                 ['json' =>  $wallet_input, 'http_errors' => false]);
     
             $wallet_result = (string) $wallet_response->getBody();
-            error_log(__FUNCTION__ . ' | '. $action .', result: ' . $wallet_result);
+            error_log(__FUNCTION__ . 
+                ' | '. $action . ' | ' . $wallet_response->getStatusCode() .
+                ' | result: ' . $wallet_result . 
+                ' | input: '. json_enocde($wallet_input));
             return json_decode($wallet_result);
 
         } catch (Exception $e) {
