@@ -83,16 +83,16 @@ class GameController extends Controller
     {
         if($request->isRequestValid()){
             // init local storage
-            $sessionId = Input::get('sessionId');
-            $disk = $this->getDisk($sessionId);
+            $walletAddress = self::getWalletAddress();
+            $disk = $this->getDisk($walletAddress);
 
             if ($disk !== false){
                 // TODO: session exists?      
-                $wallet_balance = $this->getDiskBalance($sessionId);
+                $wallet_balance = $this->getDiskBalance($walletAddress);
 
             } else {
                 // call wallet
-                $wallet_balance = $this->initPlayer($sessionId);
+                $wallet_balance = $this->initPlayer($walletAddress);
             }
 
             $extra_response = array(
@@ -118,22 +118,23 @@ class GameController extends Controller
     {   
         if($request->isRequestValid()){
 
-            $sessionId = Input::get('sessionId');
             $transactionId = Input::get('transactionId');
             $betAmount = Input::get('betAmount')/pow(10,2); // calculate for cents purpose
             $winAmount = Input::get('winAmount')/pow(10,2);// calculate for cents purpose
+
+            $walletAddress = self::getWalletAddress();
 
             /*
             wager step
             */
 
             if( $betAmount >= 0.01){ //bet amount must be > 0.01 (equal to 1 ggc)
-                $player_balance = $this->getDiskBalance($sessionId);
+                $player_balance = $this->getDiskBalance($walletAddress);
 
                 // not start yet, auto start
                 if($player_balance === false){
-                    error_log(__FUNCTION__ . '|' . $sessionId . '| not start, auto start player');
-                    $player_balance = $this->initPlayer($sessionId);
+                    error_log(__FUNCTION__ . '|' . $walletAddress . '| not start, auto start player');
+                    $player_balance = $this->initPlayer($walletAddress);
                 }
 
                 if($player_balance === false){
@@ -147,8 +148,8 @@ class GameController extends Controller
                 if($player_balance >= $betAmount){
 
                     // rec current tx
-                    $disk = $this->getDisk($sessionId);
-                    $disk->append($sessionId, json_encode([
+                    $disk = $this->getDisk($walletAddress);
+                    $disk->append($walletAddress, json_encode([
                         'transactionId' => $transactionId, 
                         'betAmount' => $betAmount, 
                         'winAmount' => $winAmount,
@@ -196,14 +197,14 @@ class GameController extends Controller
     {
         if($request->isRequestValid()){
             
-            $sessionId = Input::get('sessionId');
+            $walletAddress = self::getWalletAddress();
 
-            $player_balance = $this->getDiskBalance($sessionId);
+            $player_balance = $this->getDiskBalance($walletAddress);
 
             // not start yet, auto start
             if($player_balance === false){
-                error_log(__FUNCTION__ . '|' . $sessionId . '| not start, auto start player');
-                $player_balance = $this->initPlayer($sessionId);
+                error_log(__FUNCTION__ . '|' . $walletAddress . '| not start, auto start player');
+                $player_balance = $this->initPlayer($walletAddress);
             }
 
             if($player_balance === false){
@@ -233,13 +234,13 @@ class GameController extends Controller
     {
         if($request->isRequestValid()){
             
-            $sessionId = Input::get('sessionId');
+            $walletAddress = self::getWalletAddress();
 
             // move to waitting
-            $this->syncDiskToGGC($sessionId);
+            $this->syncDiskToGGC($walletAddress);
 
             // sync to ggc
-            $this->syncDiskToGGC($sessionId, true); // TODO: unsync this step
+            $this->syncDiskToGGC($walletAddress, true); // TODO: unsync this step
             
             // // unsync call
             // $unsync_input = Input::json()->all();
@@ -262,7 +263,7 @@ class GameController extends Controller
     {
         if($request->isRequestValid()){
             
-            $sessionId = Input::get('sessionId');
+            $walletAddress = self::getWalletAddress();
 
             // return $request->validateSuccess(array());
 
@@ -274,7 +275,7 @@ class GameController extends Controller
             // ob_end_flush();
             // flush();
 
-            $this->syncDiskToGGC($sessionId, true);
+            $this->syncDiskToGGC($walletAddress, true);
 
             return $request->validateSuccess(array());
         }
@@ -352,8 +353,13 @@ class GameController extends Controller
         }
     }
 
+    // get current wallet addr
+    private static function getWalletAddress() {
+        return explode('_', Input::get('token'))[0];
+    }
+
     // init without start
-    private function initPlayer($sessionId) {
+    private function initPlayer($data_key) {
         // parse token
         $wallet_input = Input::json()->all();
         $tokens = explode('_', $wallet_input['token']);
@@ -367,34 +373,34 @@ class GameController extends Controller
         }
 
         // init disk
-        $this->initDisk($sessionId, 
+        $this->initDisk($data_key, 
             $wallet_result->balance, $wallet_result->nextUnlockToken, $wallet_input['walletAddress']);
 
         return $wallet_result->balance;
     }
 
     // init disk
-    private function initDisk($sessionId, $balance, $nextUnlockToken, $walletAddress){
+    private function initDisk($data_key, $balance, $nextUnlockToken, $walletAddress){
         $disk = Storage::disk($this->disk_name);
-        $disk->put($sessionId, json_encode([
+        $disk->put($data_key, json_encode([
             'balance' => $balance, 
             'nextUnlockToken' => $nextUnlockToken,
             'walletAddress' => $walletAddress,
             ]));
-        error_log(__FUNCTION__ . ' | ' . $sessionId);
+        error_log(__FUNCTION__ . ' | ' . $data_key);
     }
 
     // get session disk
-    private function getDisk($sessionId, $waiting=false){
+    private function getDisk($data_key, $waiting=false){
         $disk = Storage::disk($this->disk_name);
 
-        if (!$disk->exists($sessionId)){
-            error_log(__FUNCTION__ . '|' . $sessionId . '| not exists');
+        if (!$disk->exists($data_key)){
+            error_log(__FUNCTION__ . '|' . $data_key . '| not exists');
             return false;
         }
 
-        if (!$waiting && $disk->exists($this->disk_waitting_dir . $sessionId)){
-            error_log(__FUNCTION__ . '|' . $sessionId . '| waitting sync');
+        if (!$waiting && $disk->exists($this->disk_waitting_dir . $data_key)){
+            error_log(__FUNCTION__ . '|' . $data_key . '| waitting sync');
             return false;
         }
 
@@ -402,18 +408,18 @@ class GameController extends Controller
     }
 
     // get disk balance （緩存餘額）
-    private function getDiskBalance($sessionId){
+    private function getDiskBalance($data_key){
 
-        $disk = $this->getDisk($sessionId);
+        $disk = $this->getDisk($data_key);
 
         if (!$disk){
-            error_log(__FUNCTION__ . '|' . $sessionId . '| disk not found');
+            error_log(__FUNCTION__ . '|' . $data_key . '| disk not found');
             return false;
         }
 
         // parse data record
         $disk_balance = 0;
-        $split_data = preg_split('/\s/', $disk->get($sessionId));
+        $split_data = preg_split('/\s/', $disk->get($data_key));
         foreach($split_data as $key => $value){
             if(!empty($value)){
                 $value = json_decode($value);
@@ -433,22 +439,22 @@ class GameController extends Controller
     }
     
     // sync disk to GGC (上鏈)
-    private function syncDiskToGGC($sessionId, $waitting=false){
+    private function syncDiskToGGC($data_key, $waitting=false){
         
         // if is not waitting, check balance and move to waitting dir first
         if(!$waitting){
 
-            $disk_balance = $this->getDiskBalance($sessionId);
+            $disk_balance = $this->getDiskBalance($data_key);
 
             if(!$disk_balance){
                 return false;
             }
 
-            $disk = $this->getDisk($sessionId);
+            $disk = $this->getDisk($data_key);
 
             // parse data record
             $transactions = ['start' => [], 'play' => []];
-            $split_data = preg_split('/\s/', $disk->get($sessionId));
+            $split_data = preg_split('/\s/', $disk->get($data_key));
             foreach($split_data as $key => $value){
                 if(!empty($value)){
                     $value = json_decode($value);
@@ -464,7 +470,7 @@ class GameController extends Controller
 
             // check start
             if(sizeof($transactions['start']) !== 1){
-                error_log(__FUNCTION__ . '|' . $sessionId . '| unknown start');
+                error_log(__FUNCTION__ . '|' . $data_key . '| unknown start');
                 return false;
             }
 
@@ -476,25 +482,25 @@ class GameController extends Controller
             $wallet_result = self::call_wallet('balance', ['timestamp' => time(), 'walletAddress' => $walletAddress, 'unlockToken' => $nextUnlockToken]);
 
             if(!isset($wallet_result->statusCode) || $wallet_result->statusCode != 0){
-                error_log(__FUNCTION__ . '|' . $sessionId . '| wallet api (balance) error');
+                error_log(__FUNCTION__ . '|' . $data_key . '| wallet api (balance) error');
                 return false;
             }
 
             if($wallet_result->balance != $transactions['start'][0]->balance){
-                error_log(__FUNCTION__ . '|' . $sessionId . '| balance mismatch');
+                error_log(__FUNCTION__ . '|' . $data_key . '| balance mismatch');
                 // move to error
-                $disk->move($sessionId, $this->disk_error_dir . $sessionId);
+                $disk->move($data_key, $this->disk_error_dir . $data_key);
                 return false;
             }
 
             // check complete, move to waitting dir
-            $disk->move($sessionId, $this->disk_waitting_dir . $sessionId);
+            $disk->move($data_key, $this->disk_waitting_dir . $data_key);
 
             return $disk_balance;
         }
 
         // get waiting disk
-        $disk = $this->getDisk($this->disk_waitting_dir . $sessionId, true);
+        $disk = $this->getDisk($this->disk_waitting_dir . $data_key, true);
 
         if(!$disk){
             return false;
@@ -502,7 +508,7 @@ class GameController extends Controller
 
         // parse data record
         $transactions = ['start' => [], 'play' => []];
-        $split_data = preg_split('/\s/', $disk->get($this->disk_waitting_dir . $sessionId));
+        $split_data = preg_split('/\s/', $disk->get($this->disk_waitting_dir . $data_key));
         foreach($split_data as $key => $value){
             if(!empty($value)){
                 $value = json_decode($value);
@@ -518,7 +524,7 @@ class GameController extends Controller
 
         // check start
         if(sizeof($transactions['start']) !== 1){
-            error_log(__FUNCTION__ . '|' . $sessionId . '| unknown start');
+            error_log(__FUNCTION__ . '|' . $data_key . '| unknown start');
             return false;
         }
 
@@ -539,37 +545,37 @@ class GameController extends Controller
             ];
             $wallet_result = self::call_wallet('play', $wallet_input);
             if(!isset($wallet_result->statusCode) || $wallet_result->statusCode != 0){
-                error_log(__FUNCTION__ . '|' . $sessionId . '| call wallet failed' . $nextx->transactionId);
+                error_log(__FUNCTION__ . '|' . $data_key . '| call wallet failed' . $nextx->transactionId);
                 $retrys[] = $nextx;
                 continue;
             }
-            error_log(__FUNCTION__ . '|' . $sessionId . '| tx success => ' . $nextx->transactionId);
+            error_log(__FUNCTION__ . '|' . $data_key . '| tx success => ' . $nextx->transactionId);
             $nextUnlockToken = $wallet_result->nextUnlockToken;
         };
 
         $wallet_result = self::call_wallet('balance', ['timestamp' => time(), 'walletAddress' => $walletAddress, 'unlockToken' => $nextUnlockToken]);
 
         if(!isset($wallet_result->statusCode) || $wallet_result->statusCode != 0){
-            error_log(__FUNCTION__ . '|' . $sessionId . '| call wallet failed | when init');
+            error_log(__FUNCTION__ . '|' . $data_key . '| call wallet failed | when init');
             $last_balance = 0;
         } else {
             $last_balance = $wallet_result->balance;
-            $disk->append($this->disk_waitting_dir . $sessionId, json_encode([
+            $disk->append($this->disk_waitting_dir . $data_key, json_encode([
                 'balance' => $last_balance, 
                 'retrys' => $retrys, 
                 ]));            
         }
 
         // move to finished
-        $disk->move($this->disk_waitting_dir . $sessionId, $this->disk_finished_dir . date("Ymd"). '/' . $sessionId . '_' . time());
+        $disk->move($this->disk_waitting_dir . $data_key, $this->disk_finished_dir . date("Ymd"). '/' . $data_key . '_' . time());
 
         // move to retry
         if(!empty($retrys)) {
-            $this->initDisk($this->disk_retry_dir . $sessionId, 
+            $this->initDisk($this->disk_retry_dir . $data_key, 
                 $last_balance, $nextUnlockToken, $walletAddress);
 
             foreach($retrys as $key => $value) {
-                $disk->append($this->disk_retry_dir . $sessionId, json_encode([
+                $disk->append($this->disk_retry_dir . $data_key, json_encode([
                     'transactionId' => $value->transactionId, 
                     'betAmount' => $value->betAmount, 
                     'winAmount' => $value->winAmount,
