@@ -216,7 +216,7 @@ class GameController extends Controller
             }
 
             $extra_response = array(
-                'balance' => number_format($player_balance*pow(10,2), 0, '.', ''),
+                'balance' => number_format($player_balance*pow(10,4), 0, '.', ''),
                 'balanceSequence' => ''
             );
 
