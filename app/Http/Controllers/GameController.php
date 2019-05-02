@@ -291,18 +291,35 @@ class GameController extends Controller
     public function credit(CreditRequest $request)
     {
         if($request->isRequestValid()){
+
+            $creditAmount = Input::get('amount')/pow(10,2);// calculate for cents purpose
             
+            $wallet_input = [
+                'timestamp' =>  time(),
+                'walletAddress' =>  self::getWalletAddress(),
+                'creditAmount'  =>  $creditAmount
+            ];
+            $wallet_result = self::call_wallet('credit', $wallet_input);
+           
+            if(!isset($wallet_result->statusCode) || $wallet_result->statusCode != 0){
+                $extra_response = array(
+                    'statusCode'=>444,
+                    'status'=>'something went wrong'
+                );
+                return $request->validateSuccess($extra_response);
+            }
 
             $extra_response = array(
-                'balance' =>  $this->getBalance(),
-                'balanceSequence' => ''
+                'balance' =>  number_format($wallet_result->balance*pow(10,2), 0, '.', ''),
+                'amount' => $wallet_result->creditAmount*pow(10,2),
+                'creditTX' => $wallet_result->creditTX
             );
             return $request->validateSuccess($extra_response);
         }
     }
 
     /**
-     * Revoke: not ready yet (尚未討論)
+     * Revoke: not ready yet (尚未討論);
      * 取回或取消某筆下注
      * 
      * @return \Illuminate\Http\Response
