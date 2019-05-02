@@ -98,7 +98,7 @@ class GameController extends Controller
             $extra_response = array(
                 'playerId' => Input::get('partnerPlayerId'),
                 'sessionId' => Input::get('sessionId'),
-                'balance' => number_format($wallet_balance*pow(10,2), 0, '.', ''),
+                'balance' => self::getResponseBalance($wallet_balance),
                 'balanceSequence' => '',
                 'currency' => Input::get('currency'),
                 'betLimitId' => '',
@@ -161,7 +161,7 @@ class GameController extends Controller
                     $player_balance += $winAmount;
 
                     $extra_response = array(
-                        'balance' => number_format($player_balance*pow(10,2), 0, '.', ''),
+                        'balance' => self::getResponseBalance($player_balance),
                         'balanceSequence' => ''
                     );
 
@@ -216,7 +216,7 @@ class GameController extends Controller
             }
 
             $extra_response = array(
-                'balance' => number_format($player_balance*pow(10,2), 0, '.', ''),
+                'balance' => self::getResponseBalance($player_balance),
                 'balanceSequence' => ''
             );
 
@@ -310,8 +310,8 @@ class GameController extends Controller
             }
 
             $extra_response = array(
-                'balance' =>  number_format($wallet_result->balance*pow(10,2), 0, '.', ''),
-                'amount' => $wallet_result->creditAmount*pow(10,2),
+                'balance' =>  self::getResponseBalance($wallet_result->balance),
+                'amount' => self::getResponseAmount($wallet_result->creditAmount),
                 'creditTX' => $wallet_result->creditTX
             );
             return $request->validateSuccess($extra_response);
@@ -368,6 +368,16 @@ class GameController extends Controller
             error_log(__FUNCTION__ . ' | ' . $e->getMessage());
             return false;
         }
+    }
+
+    // get response amount
+    private static function getResponseAmount($value) {
+        return $value*pow(10,2);
+    }
+
+    // get response balance
+    private static function getResponseBalance($balance) {
+        return number_format(self::getResponseAmount($balance), 2, '.', '');
     }
 
     // get current wallet addr
