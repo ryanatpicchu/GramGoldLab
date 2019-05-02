@@ -555,8 +555,8 @@ class GameController extends Controller
             $wallet_input = [
                 'walletAddress' => $walletAddress, 
                 'unlockToken' => $nextUnlockToken,
-                'betAmount' => $nextx->betAmount*pow(10,2),
-                'winAmount' => $nextx->winAmount*pow(10,2),
+                'betAmount' => $nextx->betAmount,
+                'winAmount' => $nextx->winAmount,
                 'round'     => $nextx->roundId,
                 'timestamp' => time(),
             ];
